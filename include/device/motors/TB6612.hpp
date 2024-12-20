@@ -1,5 +1,5 @@
-#ifndef DEVICE_TB6612_HPP
-#define DEVICE_TB6612_HPP
+#ifndef DEVICE_MOTORS_TB6612_HPP
+#define DEVICE_MOTORS_TB6612_HPP
 
 #include "Arduino.h"
 
@@ -29,4 +29,4 @@ public:
 
 }
 
-#endif // DEVICE_TB6612_HPP
+#endif // DEVICE_MOTORS_TB6612_HPP
