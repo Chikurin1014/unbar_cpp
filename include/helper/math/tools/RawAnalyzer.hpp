@@ -10,7 +10,7 @@ namespace helper::math::tools {
 class RawAnalyzer {
 public:
     using Value = double;
-    using Time = size_t;
+    using Time = double;
 
 private:
     Value prev_value;
@@ -31,8 +31,8 @@ public:
 /**
  * @brief Construct a new Raw Analyzer object
  *
- * @param first_value
- * @param first_time [ms]
+ * @param first_value (double)
+ * @param first_time [s] (double)
  */
 inline RawAnalyzer::RawAnalyzer(Value first_value, Time first_time)
   : prev_value{first_value}
@@ -43,11 +43,11 @@ inline RawAnalyzer::RawAnalyzer(Value first_value, Time first_time)
 /**
  * @brief Set the value and time for the analyzer.
  *
- * @param value
- * @param time [ms]
+ * @param value (double)
+ * @param time [s] (double)
  */
 inline auto RawAnalyzer::set(Value value, Time time) -> void {
-    const auto dt = static_cast<double>(time - this->prev_time) / 1000.0;
+    const auto dt = time - this->prev_time;
     const auto dv = value - this->prev_value;
     this->diff = dv / dt;
     this->integral += (value + this->prev_value) * dt / 2.0;
