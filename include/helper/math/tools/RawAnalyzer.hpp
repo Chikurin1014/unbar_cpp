@@ -38,7 +38,7 @@ inline auto RawAnalyzer::set(Value value, Time time) -> void {
     const auto dt = static_cast<double>(time - this->prev_time) / 1000.0;
     const auto dv = value - this->prev_value;
     this->diff = dv / dt;
-    this->integral += value * dt;
+    this->integral += (value + this->prev_value) * dt / 2.0;
     this->prev_value = value;
     this->prev_time = time;
 }
