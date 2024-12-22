@@ -15,9 +15,10 @@ private:
     SemaphoreHandle_t handle;
 
 public:
-    Semaphore(Type type);
+    Semaphore(Type type = Type::Mutex);
     ~Semaphore();
 
+    auto lock();
     auto try_lock(uint32_t wait_ms = 0) -> bool;
     auto unlock() -> bool;
 };
@@ -37,6 +38,10 @@ inline Semaphore::Semaphore(Type type) {
 
 inline Semaphore::~Semaphore() {
     vSemaphoreDelete(handle);
+}
+
+inline auto Semaphore::lock() {
+    xSemaphoreTake(handle, portMAX_DELAY);
 }
 
 inline auto Semaphore::try_lock(uint32_t wait_ms) -> bool {
