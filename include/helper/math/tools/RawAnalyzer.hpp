@@ -28,12 +28,24 @@ public:
     auto get_integral() const -> Value;
 };
 
+/**
+ * @brief Construct a new Raw Analyzer object
+ *
+ * @param first_value
+ * @param first_time [ms]
+ */
 inline RawAnalyzer::RawAnalyzer(Value first_value, Time first_time)
   : prev_value{first_value}
   , prev_time{first_time}
   , diff{0.0}
   , integral{0.0} {}
 
+/**
+ * @brief Set the value and time for the analyzer.
+ *
+ * @param value
+ * @param time [ms]
+ */
 inline auto RawAnalyzer::set(Value value, Time time) -> void {
     const auto dt = static_cast<double>(time - this->prev_time) / 1000.0;
     const auto dv = value - this->prev_value;
@@ -43,14 +55,29 @@ inline auto RawAnalyzer::set(Value value, Time time) -> void {
     this->prev_time = time;
 }
 
+/**
+ * @brief Get last value.
+ *
+ * @return double
+ */
 inline auto RawAnalyzer::get_value() const -> Value {
     return this->prev_value;
 }
 
+/**
+ * @brief Get last differential.
+ *
+ * @return double
+ */
 inline auto RawAnalyzer::get_differential() const -> Value {
     return this->diff;
 }
 
+/**
+ * @brief Get integral.
+ *
+ * @return double
+ */
 inline auto RawAnalyzer::get_integral() const -> Value {
     return this->integral;
 }
