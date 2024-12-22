@@ -17,6 +17,7 @@ private:
 public:
     Semaphore(Type type = Type::Mutex);
     ~Semaphore();
+    auto operator=(const Semaphore &) = delete;
 
     auto lock();
     auto try_lock(uint32_t wait_ms = 0) -> bool;
