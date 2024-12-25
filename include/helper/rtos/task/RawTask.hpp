@@ -30,9 +30,11 @@ public:
     auto get_state() -> eTaskState;
     auto is_alive() -> bool;
     auto get_info() -> TaskStatus_t;
+    auto get_highwatermark() -> UBaseType_t;
 
     static auto suspend_thisthread();
     static auto abort_thisthread();
+    static auto get_highwatermark_thisthread() -> UBaseType_t;
 };
 
 inline RawTask::RawTask(Parameters parameters, std::function<void()> function)
@@ -87,6 +89,10 @@ inline auto RawTask::is_alive() -> bool {
     return this->get_state() != eTaskState::eDeleted;
 }
 
+inline auto RawTask::get_highwatermark() -> UBaseType_t {
+    return uxTaskGetStackHighWaterMark(this->handle);
+}
+
 inline auto RawTask::get_info() -> TaskStatus_t {
     TaskStatus_t status;
     vTaskGetInfo(this->handle, &status, pdTRUE, eInvalid);
@@ -99,6 +105,10 @@ inline auto RawTask::suspend_thisthread() {
 
 inline auto RawTask::abort_thisthread() {
     vTaskDelete(nullptr);
+}
+
+inline auto RawTask::get_highwatermark_thisthread() -> UBaseType_t {
+    return uxTaskGetStackHighWaterMark(nullptr);
 }
 
 }
