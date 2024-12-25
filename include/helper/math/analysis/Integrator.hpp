@@ -1,11 +1,11 @@
-#ifndef HELPER_MATH_TOOLS_INTEGRATOR_HPP
-#define HELPER_MATH_TOOLS_INTEGRATOR_HPP
+#ifndef HELPER_MATH_ANALYSIS_INTEGRATOR_HPP
+#define HELPER_MATH_ANALYSIS_INTEGRATOR_HPP
 
 #include <concepts>
 
-#include "helper/math/tools/Arithmetic.hpp"
+#include "helper/math/analysis/Arithmetic.hpp"
 
-namespace helper::math::tools {
+namespace helper::math::analysis {
 
 template<class T>
 concept Integrator = requires(T integ) {
@@ -19,4 +19,4 @@ concept Integrator = requires(T integ) {
 
 }
 
-#endif // HELPER_MATH_TOOLS_INTEGRATOR_HPP
+#endif // HELPER_MATH_ANALYSIS_INTEGRATOR_HPP

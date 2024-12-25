@@ -1,11 +1,11 @@
 #ifndef HELPER_MATH_ANALYZER_HPP
 #define HELPER_MATH_ANALYZER_HPP
 
-#include "helper/math/tools/RawAnalyzer.hpp"
+#include "helper/math/analysis/RawAnalyzer.hpp"
 
 namespace helper::math {
 
-using Analyzer = helper::math::tools::RawAnalyzer;
+using Analyzer = helper::math::analysis::RawAnalyzer;
 
 }
 

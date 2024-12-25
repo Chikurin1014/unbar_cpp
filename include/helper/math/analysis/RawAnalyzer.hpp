@@ -1,11 +1,11 @@
-#ifndef HELPER_MATH_TOOLS_RAWANALYZER_HPP
-#define HELPER_MATH_TOOLS_RAWANALYZER_HPP
+#ifndef HELPER_MATH_ANALYSIS_RAWANALYZER_HPP
+#define HELPER_MATH_ANALYSIS_RAWANALYZER_HPP
 
 #include <cstddef>
 
-#include "helper/math/tools/Analyzer.hpp"
+#include "helper/math/analysis/Analyzer.hpp"
 
-namespace helper::math::tools {
+namespace helper::math::analysis {
 
 class RawAnalyzer {
 public:
@@ -84,6 +84,6 @@ inline auto RawAnalyzer::get_integral() const -> Value {
 
 }
 
-static_assert(helper::math::tools::Analyzer<helper::math::tools::RawAnalyzer>);
+static_assert(helper::math::analysis::Analyzer<helper::math::analysis::RawAnalyzer>);
 
-#endif // HELPER_MATH_TOOLS_RAWANALYZER_HPP
+#endif // HELPER_MATH_ANALYSIS_RAWANALYZER_HPP

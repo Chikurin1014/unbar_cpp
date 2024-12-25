@@ -1,11 +1,11 @@
-#ifndef HELPER_MATH_TOOLS_DIFFERENTIATOR_HPP
-#define HELPER_MATH_TOOLS_DIFFERENTIATOR_HPP
+#ifndef HELPER_MATH_ANALYSIS_DIFFERENTIATOR_HPP
+#define HELPER_MATH_ANALYSIS_DIFFERENTIATOR_HPP
 
 #include <concepts>
 
-#include "helper/math/tools/Arithmetic.hpp"
+#include "helper/math/analysis/Arithmetic.hpp"
 
-namespace helper::math::tools {
+namespace helper::math::analysis {
 
 template<class T>
 concept Differentiator = requires(T diff) {
@@ -19,4 +19,4 @@ concept Differentiator = requires(T diff) {
 
 }
 
-#endif // HELPER_MATH_TOOLS_DIFFERENTIATOR_HPP
+#endif // HELPER_MATH_ANALYSIS_DIFFERENTIATOR_HPP
