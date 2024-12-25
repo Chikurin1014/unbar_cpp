@@ -2,6 +2,7 @@
 #define HELPER_RTOS_TASK_RAWTASK_HPP
 
 #include <array>
+#include <functional>
 
 #include "freertos/FreeRTOS.h"
 

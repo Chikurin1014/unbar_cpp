@@ -1,6 +1,8 @@
 #ifndef HELPER_RTOS_TASK_SPAWNER_HPP
 #define HELPER_RTOS_TASK_SPAWNER_HPP
 
+#include <functional>
+
 #include "helper/rtos/task/Parameters.hpp"
 #include "helper/rtos/task/RawTask.hpp"
 
