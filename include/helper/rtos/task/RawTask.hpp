@@ -15,9 +15,10 @@ public:
 
 private:
     TaskHandle_t handle;
+    std::function<void()> function;
 
 public:
-    RawTask(Parameters parameters);
+    RawTask(Parameters parameters, std::function<void()> function);
     ~RawTask();
 
     auto get_handle() const -> const TaskHandle_t;
@@ -33,12 +34,18 @@ public:
     static auto abort_thisthread();
 };
 
-inline RawTask::RawTask(Parameters parameters)
-  : handle{} {
-    xTaskCreatePinnedToCore(parameters.function,
+inline RawTask::RawTask(Parameters parameters, std::function<void()> function)
+  : handle{}
+  , function{function} {
+    auto f = [](void *arg) {
+        auto f = *reinterpret_cast<std::function<void()> *>(arg);
+        f();
+        vTaskDelete(nullptr);
+    };
+    xTaskCreatePinnedToCore(f,
                             parameters.name,
                             parameters.stack_size,
-                            parameters.parameters,
+                            &this->function,
                             parameters.priority,
                             &this->handle,
                             parameters.core_id);

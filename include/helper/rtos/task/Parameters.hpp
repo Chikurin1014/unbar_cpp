@@ -8,10 +8,8 @@
 namespace helper::rtos::task {
 
 struct Parameters {
-    TaskFunction_t function;
     const char *name;
     uint32_t stack_size;
-    void *parameters;
     UBaseType_t priority;
     BaseType_t core_id;
 
@@ -19,10 +17,8 @@ struct Parameters {
 };
 
 inline Parameters::Parameters()
-  : function{nullptr}
-  , name{nullptr}
+  : name{nullptr}
   , stack_size{configMINIMAL_STACK_SIZE}
-  , parameters{nullptr}
   , priority{0}
   , core_id{1} {}
 
