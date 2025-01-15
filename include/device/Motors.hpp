@@ -8,15 +8,17 @@ namespace device {
 
 class Motors {
 public:
-    static inline constexpr uint8_t MOTOR_LEFT_DIR1_PIN = 16;
-    static inline constexpr uint8_t MOTOR_LEFT_DIR2_PIN = 17;
-    static inline constexpr uint8_t MOTOR_LEFT_PWM_PIN = 4;
-    static inline constexpr uint8_t MOTOR_RIGHT_DIR1_PIN = 33;
-    static inline constexpr uint8_t MOTOR_RIGHT_DIR2_PIN = 32;
-    static inline constexpr uint8_t MOTOR_RIGHT_PWM_PIN = 14;
+    static inline constexpr uint8_t MOTOR_LEFT_DIR1_PIN = 4;
+    static inline constexpr uint8_t MOTOR_LEFT_DIR2_PIN = 16;
+    static inline constexpr uint8_t MOTOR_LEFT_PWM_PIN = 17;
+    static inline constexpr uint8_t MOTOR_RIGHT_DIR1_PIN = 14;
+    static inline constexpr uint8_t MOTOR_RIGHT_DIR2_PIN = 33;
+    static inline constexpr uint8_t MOTOR_RIGHT_PWM_PIN = 32;
 
-    using MotorLeft = device::motors::TB6612<MOTOR_LEFT_DIR1_PIN, MOTOR_LEFT_DIR2_PIN, MOTOR_LEFT_PWM_PIN>;
-    using MotorRight = device::motors::TB6612<MOTOR_RIGHT_DIR1_PIN, MOTOR_RIGHT_DIR2_PIN, MOTOR_RIGHT_PWM_PIN>;
+    using MotorLeft =
+      device::motors::TB6612<MOTOR_LEFT_DIR1_PIN, MOTOR_LEFT_DIR2_PIN, MOTOR_LEFT_PWM_PIN>;
+    using MotorRight =
+      device::motors::TB6612<MOTOR_RIGHT_DIR1_PIN, MOTOR_RIGHT_DIR2_PIN, MOTOR_RIGHT_PWM_PIN>;
     using Order = order::Motors;
 
 private:

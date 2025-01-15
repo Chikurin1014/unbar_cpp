@@ -13,12 +13,14 @@ public:
     inline static constexpr uint8_t DIR1_PIN = DIR1;
     inline static constexpr uint8_t DIR2_PIN = DIR2;
     inline static constexpr uint8_t PWM_PIN = PWM;
+    inline static constexpr uint32_t FREQUENCY = 12800;
+    inline static constexpr uint8_t RESOLUTION_BITS = 10;
 
     TB6612() {
         pinMode(DIR1_PIN, OUTPUT);
         pinMode(DIR2_PIN, OUTPUT);
         pinMode(PWM_PIN, OUTPUT);
-        ledcAttach(PWM_PIN, 12800, 16);
+        ledcAttach(PWM_PIN, FREQUENCY, RESOLUTION_BITS);
     }
     ~TB6612() {
         ledcDetach(PWM_PIN);

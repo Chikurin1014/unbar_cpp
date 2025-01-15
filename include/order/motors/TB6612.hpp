@@ -13,7 +13,15 @@ struct TB6612 {
 
     static inline auto stop() {
         return TB6612{false, false, 0};
-    };
+    }
+
+    static inline auto normalize(float value, uint8_t resolution_bits = 10) {
+        return TB6612{
+          value >= 0,
+          value <= 0,
+          static_cast<uint16_t>(std::abs(value) * ((1 << resolution_bits) - 1)),
+        };
+    }
 };
 
 }
