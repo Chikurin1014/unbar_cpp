@@ -7,7 +7,7 @@ namespace device {
 
 class Sensors {
 public:
-    using Imu = sensors::Imu<55, 0x28>; // dummy
+    using Imu = sensors::Imu<0x28, 27>;
 
     Imu imu;
 

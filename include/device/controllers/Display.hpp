@@ -6,11 +6,12 @@
 
 namespace device::controllers {
 
+template<uint8_t DISPLAY_CS, uint8_t DISPLAY_DC, uint8_t TOUCH_CS>
 class Display {
 public:
-    inline static constexpr uint8_t DISPLAY_CS = 5;
-    inline static constexpr uint8_t DISPLAY_DC = 2;
-    inline static constexpr uint8_t TOUCH_CS = 15;
+    inline static constexpr uint8_t DISPLAY_CS = DISPLAY_CS;
+    inline static constexpr uint8_t DISPLAY_DC = DISPLAY_DC;
+    inline static constexpr uint8_t TOUCH_CS = TOUCH_CS;
 
     using TFT = Adafruit_ILI9341;
     using Ts = XPT2046_Touchscreen;

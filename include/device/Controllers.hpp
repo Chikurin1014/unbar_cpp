@@ -9,10 +9,10 @@ namespace device {
 
 class Controllers {
 public:
-    inline static constexpr char MAC[] = "";
+    inline static constexpr char CONTROLLER_MAC[] = "";
 
     using RemoteController = PS4Controller;
-    using Display = controllers::Display;
+    using Display = controllers::Display<5, 2, 15>;
 
     RemoteController rc;
     Display display;
@@ -20,7 +20,9 @@ public:
     Controllers()
       : rc{}
       , display{} {
-        rc.begin(MAC);
+        if (CONTROLLER_MAC != "") {
+            this->rc.begin(CONTROLLER_MAC);
+        }
     }
 };
 
