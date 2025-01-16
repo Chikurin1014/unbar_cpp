@@ -1,18 +1,6 @@
 #ifndef DEVICE_SENSORS_IMU_HPP
 #define DEVICE_SENSORS_IMU_HPP
 
-#ifndef __I2C_BUS
-#define __I2C_BUS 0
-#endif
-
-#ifndef __I2C_SDA
-#define __I2C_SDA 21
-#endif
-
-#ifndef __I2C_SCL
-#define __I2C_SCL 22
-#endif
-
 #include "Adafruit_BNO055.h"
 #include "Wire.h"
 
@@ -21,12 +9,21 @@ namespace device::sensors {
 template<uint8_t ADDR, uint8_t RESET_PIN, int16_t ID = -1>
 class Imu {
 private:
-    inline static constexpr uint8_t ADDR = ADDR;
-    inline static constexpr uint8_t RESET_PIN = RESET_PIN;
-    inline static constexpr int16_t ID = ID;
-    inline static constexpr uint8_t I2C_BUS = __I2C_BUS;
-    inline static constexpr uint8_t I2C_SDA = __I2C_SDA;
-    inline static constexpr uint8_t I2C_SCL = __I2C_SCL;
+#ifdef UNBAR_I2C_BUS
+    constexpr inline static uint8_t I2C_BUS = UNBAR_I2C_BUS;
+#else
+    constexpr inline static uint8_t I2C_BUS = 0;
+#endif
+#ifdef UNBAR_I2C_SDA
+    constexpr inline static uint8_t I2C_SDA = UNBAR_I2C_SDA;
+#else
+    constexpr inline static uint8_t I2C_SDA = 21;
+#endif
+#ifdef UNBAR_I2C_SCL
+    constexpr inline static uint8_t I2C_SCL = UNBAR_I2C_SCL;
+#else
+    constexpr inline static uint8_t I2C_SCL = 22;
+#endif
 
     Adafruit_BNO055 imu;
     TwoWire wire;
@@ -61,6 +58,7 @@ public:
         return this->imu.isFullyCalibrated();
     }
 };
+
 }
 
 #endif // DEVICE_SENSORS_IMU_HPP
