@@ -27,12 +27,21 @@ private:
 
     Adafruit_BNO055 imu;
     TwoWire wire;
+    imu::Vector<3> last_vec;
+    imu::Quaternion last_quat;
+
+    constexpr inline static auto is_valid(double v) {
+        return v >= 0.0105 || v <= -0.0105;
+    }
 
 public:
     Imu()
-      : wire{I2C_BUS} {
+      : wire{I2C_BUS}
+      , last_vec{0, 0, 0}
+      , last_quat{1, 0, 0, 0} {
         pinMode(RESET_PIN, OUTPUT);
-        this->wire.setPins(I2C_SDA, I2C_SCL);
+        pinMode(I2C_SDA, INPUT_PULLUP);
+        pinMode(I2C_SCL, INPUT_PULLUP);
         this->imu = Adafruit_BNO055{ID, ADDR, &this->wire};
         this->restart();
     }
@@ -41,10 +50,63 @@ public:
     }
 
     inline auto get_accel() {
-        return this->imu.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+        auto v = this->imu.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+        if (is_valid(v[2])) {
+            this->last_vec = v;
+        }
+        return this->last_vec;
     }
+
+    inline auto get_mag() {
+        auto v = this->imu.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+        if (is_valid(v[2])) {
+            this->last_vec = v;
+        }
+        return this->last_vec;
+    }
+
+    inline auto get_gyro() {
+        auto v = this->imu.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+        if (is_valid(v[2])) {
+            this->last_vec = v;
+        }
+        return this->last_vec;
+    }
+
+    inline auto get_euler() {
+        auto v = this->imu.getVector(Adafruit_BNO055::VECTOR_EULER);
+        if (is_valid(v[2])) {
+            this->last_vec = v;
+        }
+        return this->last_vec;
+    }
+
+    inline auto get_lineacc() {
+        auto v = this->imu.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+        if (is_valid(v[2])) {
+            this->last_vec = v;
+        }
+        return this->last_vec;
+    }
+
+    inline auto get_gravity() {
+        auto v = this->imu.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
+        if (is_valid(v[2])) {
+            this->last_vec = v;
+        }
+        return this->last_vec;
+    }
+
     inline auto get_quat() {
-        return this->imu.getQuat();
+        auto q = this->imu.getQuat();
+        if (is_valid(q.z())) {
+            this->last_quat = q;
+        }
+        return this->last_quat;
+    }
+
+    inline auto get_temp() {
+        return this->imu.getTemp();
     }
 
     inline auto restart() {
@@ -52,6 +114,9 @@ public:
         delay(1);
         digitalWrite(RESET_PIN, HIGH);
         this->imu.begin();
+        this->wire.setPins(I2C_SDA, I2C_SCL);
+        this->wire.setClock(50000);
+        this->imu.setExtCrystalUse(false);
     }
 
     inline auto is_calibrated() {
