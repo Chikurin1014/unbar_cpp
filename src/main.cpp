@@ -1,80 +1,94 @@
 #include <cmath>
+#include <functional>
 #include <mutex>
 
 #include "Arduino.h"
 
+#include "controller/Controller.hpp"
 #include "device/Unbar.hpp"
 #include "helper/dummy_include.hpp"
 #include "helper/rtos/Semaphores.hpp"
 #include "helper/rtos/Task.hpp"
+#include "order/Motors.hpp"
 
-using Unbar = device::Unbar;
-using Order = device::Motors::Order;
-using Semaphore = helper::rtos::Semaphore;
-using Task = helper::rtos::Task;
-using Spawner = helper::rtos::TaskSpawner;
-
-void setup() {
-    Serial.begin(115200);
-    auto unbar = Unbar();
-    auto unbar_mtx = Semaphore();
-    auto controll_task = Spawner()
-                           .set_function([&unbar, &unbar_mtx]() {
-                               TickType_t tick = 0;
-                               constexpr auto DELAY_MS = 10;
-                               constexpr auto K_P = 6.0 / std::numbers::pi;
-                               constexpr auto K_D = 0.0 * K_P;
-                               constexpr auto T_P = 0.05;
-                               constexpr auto T_D = 0.05;
-                               auto pitch_target = 0.0;
-                               auto e = 0.0;
-                               auto e_diff = 0.0;
-                               auto last_e = 0.0;
-                               auto last_time = 0.0;
-                               while (true) {
-                                   tick = xTaskGetTickCount();
-                                   {
-                                       auto lk = std::lock_guard(unbar_mtx);
-                                       const auto time = pdTICKS_TO_MS(tick) / 1000.0;
-                                       const auto dt = time - last_time;
-                                       // sensing
-                                       const auto accel = unbar.sensors.imu.get_accel();
-                                       const auto pitch = std::atan2(accel.y(), accel.z());
-                                       // filter
-                                       e = (1 - dt / T_P) * e + (pitch_target - pitch) * (dt / T_P);
-                                       e_diff = (1 - dt / T_D) * e_diff + (e - last_e) * (dt / T_D);
-                                       // offset
-                                       //    if (e > 0.05) {
-                                       //        e += 0.03 * std::numbers::pi;
-                                       //    } else if (e < -0.05) {
-                                       //        e -= 0.03 * std::numbers::pi;
-                                       //    } else {
-                                       //        e = 0.0;
-                                       //    }
-                                       // control
-                                       using MD = Order::MotorDriver;
-                                       const auto order = Order{
-                                         .left = MD::normalize(-K_P * e - K_D * e_diff),
-                                         .right = MD::normalize(K_P * e + K_D * e_diff),
-                                       };
-                                       Serial.printf(">e:%lf\n>e_diff:%lf\n", e, e_diff);
-                                       unbar.motors.run(order);
-                                       // update state
-                                       last_time = time;
-                                       last_e = e;
-                                   }
-                                   xTaskDelayUntil(&tick, pdMS_TO_TICKS(DELAY_MS));
-                               }
-                           })
-                           .set_stack_size(4096)
-                           .set_priority(2)
-                           .spawn();
-    while (controll_task.is_alive()) {
-        // Do nothing
+auto update_tick(TickType_t &tick) -> void {
+    while (true) {
+        tick = xTaskGetTickCount();
+        vTaskDelayUntil(&tick, pdMS_TO_TICKS(1));
     }
 }
 
-void loop() {
-    Serial.println("All tasks are finished.");
-    delay(1000);
+auto debug_print(const controller::Controller &controller, helper::rtos::Semaphore &mtx_serial)
+  -> void {
+    while (true) {
+        auto state = controller.get_state();
+        {
+            auto _lock = std::lock_guard(mtx_serial);
+            Serial.printf(">time:%lf\n", state.time);
+            Serial.printf(">target_angle:%lf\n", state.target_angle);
+            Serial.printf(">error:%lf\n", state.error.get_value());
+            Serial.printf(">error_diff:%lf\n", state.error_diff);
+        }
+        delay(50);
+    }
 }
+
+auto controll(device::Unbar &unbar,
+              helper::rtos::Semaphore &mtx_unbar,
+              controller::Controller &controller,
+              helper::rtos::Semaphore &mtx_controller,
+              TickType_t &tick) -> void {
+    while (true) {
+        // update time
+        auto time = pdTICKS_TO_MS(tick) / 1000.0;
+        {
+            auto _lock = std::scoped_lock(mtx_unbar, mtx_controller);
+            auto input = unbar.sensors.imu.get_accel();
+            auto output = controller.step(input, time);
+            unbar.motors.run(output);
+        }
+        vTaskDelayUntil(&tick, pdMS_TO_TICKS(10));
+    }
+}
+
+void setup() {
+    Serial.begin(115200);
+    auto mtx_serial = helper::rtos::Semaphore();
+    auto unbar = device::Unbar();
+    auto mtx_unbar = helper::rtos::Semaphore();
+    auto tick = xTaskGetTickCount();
+    auto controller = controller::Controller();
+    auto mtx_controller = helper::rtos::Semaphore();
+
+    auto update_tick_task = helper::rtos::TaskSpawner()
+                              .set_core1()
+                              .set_priority(2)
+                              .set_function(std::bind(update_tick, std::ref(tick)))
+                              .spawn();
+
+    auto controll_task = helper::rtos::TaskSpawner()
+                           .set_core1()
+                           .set_priority(1)
+                           .set_function(std::bind(controll,
+                                                   std::ref(unbar),
+                                                   std::ref(mtx_unbar),
+                                                   std::ref(controller),
+                                                   std::ref(mtx_controller),
+                                                   std::ref(tick)))
+                           .set_stack_size(4096)
+                           .spawn();
+
+    auto debug_print_task =
+      helper::rtos::TaskSpawner()
+        .set_core0()
+        .set_priority(0)
+        .set_function(std::bind(debug_print, std::ref(controller), std::ref(mtx_serial)))
+        .set_stack_size(4096)
+        .spawn();
+
+    while (update_tick_task.is_alive()) {
+        // do nothing
+    }
+}
+
+void loop() {}
